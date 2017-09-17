@@ -11,6 +11,6 @@
     "noUnusedParameters": true
   },
   "files": [
-    "index.ts"
+    "index.ts", "./lib/config.ts", "./lib/index.ts"
   ]
 }
