@@ -1,11 +1,9 @@
 import * as express from 'express';
 import * as twit from 'twit';
 
-import config from './config';
-
 const router: express.Router = express.Router();
 
-const Twitter: twit = new twit(config);
+import { Twitter } from '../';
 
 
 router.get('/trends/place', (_, res: express.Response): void | any => {
