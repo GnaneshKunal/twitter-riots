@@ -2,10 +2,13 @@ import * as express from 'express';
 import * as path from 'path';
 import * as http from 'http';
 import * as dotenv from 'dotenv';
+import * as morgan from 'morgan';
+
+import * as twitRouter from './lib/index';
 
 dotenv.config();
 
-const PORT: string | number = process.env.port || 8080;
+const PORT: string | number = process.env.PORT || 8080;
 
 class App {
     public express: express.Application;
@@ -17,11 +20,13 @@ class App {
 
     private mountRoutes(): void {
         const router: express.Router = express.Router();
+        this.express.use(morgan('tiny'));
         this.express.use(express.static('.'));
-        router.get('/', (_, res: express.Response) => {
-            return res.sendFile(path.join( __dirname, 'index.html'));
+        router.get(['/', '/trends'], (_, res: express.Response) => {
+            return res.sendFile(path.join( __dirname, '../index.html'));
         });
         this.express.use('/', router);
+        this.express.use('/api', twitRouter.default);
     }
 }
 
