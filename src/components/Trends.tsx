@@ -17,12 +17,22 @@ interface ITrendsProps {
     state: any
 }
 
-class Trends extends React.Component<ITrendsProps, any> {
+interface ITrendsState {
+    location: string
+}
+
+class Trends extends React.Component<ITrendsProps, ITrendsState> {
+    
+    constructor(props: any) {
+        super(props);
+
+        this.state = { location: '' };
+    }
+
     onFormSubmit(event: any) {
         event.preventDefault();
-        var search: String = "this.refs.search.value;";
         this.props.trends({
-            search
+            search: this.state.location
         });
     }
     renderAlert() {
@@ -50,10 +60,11 @@ class Trends extends React.Component<ITrendsProps, any> {
                 <fieldset className="form-group">
                     <label>Search</label>
                     <input ref="search"
-                    name="search" className="form-control" 
+                    name="search" className="form-control"
+                    value={this.state.location}
+                    onChange={event => this.setState({ location: event.target.value})}
                     placeholder="search" type="text" />
                 </fieldset>
-                {/* {this.renderAlert()} */}
                 {this.renderResult()}
                 <button type="submit" className="btn btn-primary">Submit</button>
             </form>
@@ -67,7 +78,7 @@ const mapStateToProps = (state: any) => state;
 
 export function mapDispatchToProps(dispatch: Dispatch<any>) {
     return {
-      trends: (search: String) => dispatch(actions.trends(search))
+      trends: (search: String) => dispatch<any>(actions.trends(search))
     }
   }
 
