@@ -19,7 +19,7 @@ export function trends(search: String) {
         // if (search)
         //     return dispatch(searchError("Please enter a term"));
         
-        return axios.get(`${ROOT_URL}/api/trends/place`)
+        return axios.get(`${ROOT_URL}/api/trends/place?place=${search.search}`)
             .then(response => {
                 dispatch({
                     type: SEARCH_TRUE,
