@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import {
     SEARCH_TRUE, SEARCH_FALSE,
-    SEARCH_ERROR
+    SEARCH_ERROR, LOCATION_TRENDS
 } from './types';
 
 interface ISearchError {
@@ -12,8 +12,22 @@ interface ISearchError {
 
 const ROOT_URL: String = 'http://localhost:8080';
 
+export function locationTrends(search: {search: String }) {
+    return function(dispatch: any) {
+        return axios.get(`${ROOT_URL}/getTrends/${search.search}`)
+            .then(response => {
+                dispatch({
+                    type: LOCATION_TRENDS,
+                    payload: response.data
+                })
+            })
+            .catch(err => {
+                console.log(err.response)
+            })
+    }
+}
+
 export function trends(search: String) {
-    console.log(search.search);
     return function(dispatch: any) {
 
         // if (search)
