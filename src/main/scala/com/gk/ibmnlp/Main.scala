@@ -24,4 +24,14 @@ object Main {
     .entities(entitiesOptions)
     .keywords(keywordOptions)
     .build()
+
+
+  def analyze(text: String): AnalysisResults = {
+    val parameters: AnalyzeOptions = new AnalyzeOptions.Builder()
+      .text(text)
+      .features(features)
+      .build()
+
+    service.analyze(parameters).execute()
+  }
 }
