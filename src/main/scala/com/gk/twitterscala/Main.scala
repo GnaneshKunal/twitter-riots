@@ -2,6 +2,8 @@ package com.gk.twitterscala
 
 import java.util
 import javax.tools.JavaFileManager.Location
+import java.net.URLEncoder
+import java.io.UnsupportedEncodingException
 
 import cats.effect.IO
 import io.circe._
@@ -22,11 +24,14 @@ import io.circe.parser._
 import scala.collection.mutable.ArrayBuffer
 import scala.xml._
 
+class URLEncode(val text: String) extends UnsupportedEncodingException {
+  val encodedString = URLEncoder.encode(text, "UTF-8")
+}
+
 
 object Main extends StreamApp[IO] with Http4sDsl[IO] {
 
   import com.gk.ibmnlp.Main._
-
 
   val cb = new ConfigurationBuilder()
   cb.setDebugEnabled(true)
@@ -45,7 +50,6 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
 
       val (lat, long) = getLatAndLong(location)
       val geoL: GeoLocation = new GeoLocation(lat, long)
-      val geoQ: GeoQuery = new GeoQuery(geoL)
 
       val m = twitter.getClosestTrends(geoL)
       val k = m.get(0).getWoeid
@@ -99,7 +103,6 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       val tweetsJson = new ArrayBuffer[Json]()
       while (iTweets.hasNext) {
         val t: twitter4j.Status = iTweets.next
-        val tu = t.getUser
         if (t.getText.contains(hashtag))
           tweetsJson += Json.obj(
             t.getId.toString -> Json.obj (
@@ -111,6 +114,20 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       }
 
       Ok(Json.fromValues(tweetsJson))
+
+    case req @ GET -> Root / "classifyTweet" =>
+      val text = req.params("text").toString
+
+      val html = classifyText(text)
+
+      val entities = html \\ "span" \\ "b"
+
+      val strength = (for (entity <- entities) yield entity.text.toInt).toArray.sum
+
+      Ok(Json.obj(
+        text -> Json.fromInt(strength)
+      ))
+
     }
 
 
@@ -139,15 +156,18 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
   }
 
   def classifyText(text: String) = {
-    val httpClient = PooledHttp1Client[IO]()
-    def requestForClassify(text: String): IO[String] = {
-      val arr = text.split(" ").toList.init.mkString("")
-      val target = "http://sentistrength.wlv.ac.uk/results.php?text=I+love+cats.&submit=Detect+Sentiment"
-      httpClient.expect[String](target)
-    }
+    def requestForClassify(text: String)= {
+      val encodedStr = new URLEncode(text).encodedString
+      val target = "http://sentistrength.wlv.ac.uk/results.php?text=" + encodedStr + "&domain=Riots&submit=Detect+Sentiment+in+Domain"
+      val parserFactory = new org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
+      val parser = parserFactory.newSAXParser()
+      val source = new org.xml.sax.InputSource(target)
+      val adapter = new scala.xml.parsing.NoBindingFactoryAdapter
+      val feed = adapter.loadXML(source, parser)
 
-    val result = requestForClassify(text).unsafeRunSync()
-    val xml = XML.loadString(result)
+      feed
+    }
+    requestForClassify(text)
   }
 }
 
