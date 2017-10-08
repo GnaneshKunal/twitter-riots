@@ -66,7 +66,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     case GET -> Root / "getTweets" / hashtag =>
 
       val query: twitter4j.Query = new twitter4j.Query(hashtag)
-      query.setCount(3)
+      query.setCount(10)
 
       val tweets = twitter.search(query).getTweets
       val iTweets = tweets.listIterator()
@@ -78,6 +78,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
         tweetsJson += Json.obj(
           t.getId.toString -> Json.obj (
             "tweet" -> Json.fromString(t.getText),
+            "sentiment" -> Json.fromInt(classifyText(t.getText)),
             "tweetID" -> Json.fromLong(t.getId),
             "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
             "retweetCount" -> Json.fromLong(t.getRetweetCount),
@@ -107,6 +108,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
           tweetsJson += Json.obj(
             t.getId.toString -> Json.obj (
               "tweet" -> Json.fromString(t.getText),
+              "sentiment" -> Json.fromInt(classifyText(t.getText)),
               "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
               "retweetCount" -> Json.fromLong(t.getRetweetCount)
             )
@@ -118,11 +120,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     case req @ GET -> Root / "classifyTweet" =>
       val text = req.params("text").toString
 
-      val html = classifyText(text)
-
-      val entities = html \\ "span" \\ "b"
-
-      val strength = (for (entity <- entities) yield entity.text.toInt).toArray.sum
+      val strength = classifyText(text)
 
       Ok(Json.obj(
         text -> Json.fromInt(strength)
@@ -167,7 +165,10 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
 
       feed
     }
-    requestForClassify(text)
+    val html = requestForClassify(text)
+    val entities = html \\ "span" \\ "b"
+
+    (for (entity <- entities) yield entity.text.toInt).toArray.sum
   }
 }
 
