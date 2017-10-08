@@ -26,5 +26,6 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "4.0.4"
 libraryDependencies += "org.scala-lang.modules" % "scala-xml_2.12" % "1.0.6"
+libraryDependencies += "com.ibm.watson.developer_cloud" % "java-sdk" % "3.7.2"
 
 cancelable in Global := true
