@@ -19,6 +19,7 @@ import twitter4j.conf.ConfigurationBuilder
 import cats.syntax.either._
 import io.circe._
 import io.circe.parser._
+import org.http4s.server.middleware._
 
 
 import scala.collection.mutable.ArrayBuffer
@@ -42,7 +43,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
   val tf = new TwitterFactory(cb.build())
   val twitter: Twitter = tf.getInstance()
 
-  val route: HttpService[IO] = HttpService[IO] {
+  val route: HttpService[IO] = CORS(HttpService[IO] {
     case GET -> Root / "hello" / name =>
       Ok(Json.obj("message" -> Json.fromString(s"Hello, $name")))
 
@@ -126,7 +127,14 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
         text -> Json.fromInt(strength)
       ))
 
-    }
+    }, CORSConfig(
+    anyOrigin = true,
+    allowCredentials = false,
+    maxAge = 0,
+    allowedOrigins = Set("http://localhost:8080/"),
+    allowedHeaders = Some(Set("User-Agent", "Keep-Alive", "Content-Type")),
+    exposedHeaders = Some(Set("x-header"))
+  ))
 
 
 
@@ -146,13 +154,6 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     (lat.toDouble, long.toDouble)
   }
 
-  def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, Nothing] = {
-    BlazeBuilder[IO]
-      .bindHttp(8080, "0.0.0.0")
-      .mountService(route,"/")
-      .serve
-  }
-
   def classifyText(text: String) = {
     def requestForClassify(text: String)= {
       val encodedStr = new URLEncode(text).encodedString
@@ -170,5 +171,13 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
 
     (for (entity <- entities) yield entity.text.toInt).toArray.sum
   }
+
+  def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, Nothing] = {
+    BlazeBuilder[IO]
+      .bindHttp(8080, "0.0.0.0")
+      .mountService(route,"/")
+      .serve
+  }
+
 }
 
