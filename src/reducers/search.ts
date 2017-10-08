@@ -1,4 +1,4 @@
-import { SEARCH_TRUE, SEARCH_FALSE, SEARCH_ERROR } from '../actions/types';
+import { SEARCH_TRUE, SEARCH_FALSE, SEARCH_ERROR, LOCATION_TRENDS } from '../actions/types';
 
 interface IActionProps {
     type: String,
@@ -12,6 +12,8 @@ export default function(state = {}, action: IActionProps) {
         case SEARCH_FALSE:
             return { ...state, search: false, data: 'Please Search something' };
         case SEARCH_ERROR:
+            return { ...state, search: false, data: action.payload };
+        case LOCATION_TRENDS:
             return { ...state, search: false, data: action.payload };
     }
     
