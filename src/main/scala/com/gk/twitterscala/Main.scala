@@ -18,11 +18,15 @@ import cats.syntax.either._
 import io.circe._
 import io.circe.parser._
 
+
 import scala.collection.mutable.ArrayBuffer
 import scala.xml._
 
 
 object Main extends StreamApp[IO] with Http4sDsl[IO] {
+
+  import com.gk.ibmnlp.Main._
+
 
   val cb = new ConfigurationBuilder()
   cb.setDebugEnabled(true)
@@ -70,6 +74,9 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
         tweetsJson += Json.obj(
           t.getId.toString -> Json.obj (
             "tweet" -> Json.fromString(t.getText),
+            "tweetID" -> Json.fromLong(t.getId),
+            "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
+            "retweetCount" -> Json.fromLong(t.getRetweetCount),
             "user" -> Json.obj(
               "id" -> Json.fromLong(tu.getId),
               "name" -> Json.fromString(tu.getName),
@@ -79,6 +86,28 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
             )
           )
         )
+      }
+
+      Ok(Json.fromValues(tweetsJson))
+
+
+    case GET -> Root / "getUserTweets" / screenName / hashtag =>
+
+      val tweets = twitter.getUserTimeline(screenName)
+      val iTweets = tweets.iterator()
+
+      val tweetsJson = new ArrayBuffer[Json]()
+      while (iTweets.hasNext) {
+        val t: twitter4j.Status = iTweets.next
+        val tu = t.getUser
+        if (t.getText.contains(hashtag))
+          tweetsJson += Json.obj(
+            t.getId.toString -> Json.obj (
+              "tweet" -> Json.fromString(t.getText),
+              "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
+              "retweetCount" -> Json.fromLong(t.getRetweetCount)
+            )
+          )
       }
 
       Ok(Json.fromValues(tweetsJson))
@@ -107,6 +136,18 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       .bindHttp(8080, "0.0.0.0")
       .mountService(route,"/")
       .serve
+  }
+
+  def classifyText(text: String) = {
+    val httpClient = PooledHttp1Client[IO]()
+    def requestForClassify(text: String): IO[String] = {
+      val arr = text.split(" ").toList.init.mkString("")
+      val target = "http://sentistrength.wlv.ac.uk/results.php?text=I+love+cats.&submit=Detect+Sentiment"
+      httpClient.expect[String](target)
+    }
+
+    val result = requestForClassify(text).unsafeRunSync()
+    val xml = XML.loadString(result)
   }
 }
 
