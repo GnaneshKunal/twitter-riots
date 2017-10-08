@@ -33,11 +33,11 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
   val tf = new TwitterFactory(cb.build())
   val twitter: Twitter = tf.getInstance()
 
-  val route: HttpService[cats.effect.IO] = HttpService[IO] {
+  val route: HttpService[IO] = HttpService[IO] {
     case GET -> Root / "hello" / name =>
-      Ok(Json.obj("message" -> Json.fromString(s"Hello, ${name}")))
+      Ok(Json.obj("message" -> Json.fromString(s"Hello, $name")))
 
-    case GET -> Root / "getTrends" / location => {
+    case GET -> Root / "getTrends" / location =>
 
       val (lat, long) = getLatAndLong(location)
       val geoL: GeoLocation = new GeoLocation(lat, long)
@@ -54,30 +54,36 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       Ok(
         Json.fromValues(arr)
       )
-    }
 
-    case GET -> Root / "getTweets" / hashtag => {
+    case GET -> Root / "getTweets" / hashtag =>
 
       val query: twitter4j.Query = new twitter4j.Query(hashtag)
-      query.setCount(50)
+      query.setCount(3)
 
       val tweets = twitter.search(query).getTweets
-
       val iTweets = tweets.listIterator()
 
-      val first: twitter4j.Status = iTweets.next()
-
-      println {
-        first
+      val tweetsJson = new ArrayBuffer[Json]()
+      while (iTweets.hasNext) {
+        val t: twitter4j.Status = iTweets.next
+        val tu = t.getUser
+        tweetsJson += Json.obj(
+          t.getId.toString -> Json.obj (
+            "tweet" -> Json.fromString(t.getText),
+            "user" -> Json.obj(
+              "id" -> Json.fromLong(tu.getId),
+              "name" -> Json.fromString(tu.getName),
+              "screenName" -> Json.fromString(tu.getScreenName),
+              "followers" -> Json.fromInt(tu.getFollowersCount),
+              "friendsCount" -> Json.fromInt(tu.getFriendsCount)
+            )
+          )
+        )
       }
 
-//      while(iTweets.hasNext) {
-//        iTweets.next().
-//      }
-
-      Ok(Json.obj("message" -> Json.fromString(s"Hello, ${hashtag}")))
+      Ok(Json.fromValues(tweetsJson))
     }
-  }
+
 
 
   def getLatAndLong(location: String): (Double, Double) = {
