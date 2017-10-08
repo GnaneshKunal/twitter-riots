@@ -26,11 +26,21 @@ router.get('/trends/place', (req: express.Request, res: express.Response): void 
                     console.log(location);
                     Twitter.get('trends/place', {
                         id: '1'
-                    }, (err: Error, data: twit.Response) => {
+                    }, (err: Error, data: any) => {
+                        console.log(data);
                         if (err)
                             throw err;
+                            Twitter.get('/geo/reverse_geocode.json?lat=40.71455&long=-74.258904', (err, data) => {
+                                console.log(data);
+                            })
                         return res.send(data);
                     });
+                    // Twitter.get('trends/place', {
+                    //     id: '1'
+                    // }, (err: Error, tweets: any, response: any) => {
+                    //     console.log(tweets);
+                    // })
+                    // 'OAuth oauth_consumer_key="6t9MhFKbmetB44czvSyWyyK84",oauth_nonce="21a1abc3bf29482191f84c6ff76661c7",oauth_signature_method="HMAC-SHA1",oauth_timestamp="1507374393",oauth_token="null",oauth_version="1.0",oauth_signature="nzMv%2Bkp96RBlw4q9FhnS8OyySSs%3D"'
                 }
             }
         })
