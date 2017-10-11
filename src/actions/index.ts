@@ -6,15 +6,16 @@ import {
 } from './types';
 
 interface ISearchError {
-    type: String,
-    payload: String
+    type: string,
+    payload: string
 }
 
-const ROOT_URL: String = 'http://localhost:8080';
+const ROOT_URL: string = 'http://localhost:8080';
 
-export function locationTrends(search: {search: String }) {
+export function locationTrends(search: {search: string }) {
     return function(dispatch: any) {
-        return axios.get(`${ROOT_URL}/getTrends/${search.search}`)
+        let searchLocation = encodeURIComponent(search.search).replace(/%20/g,'+');
+        return axios.get(`${ROOT_URL}/getTrends/${searchLocation}`)
             .then(response => {
                 dispatch({
                     type: LOCATION_TRENDS,
@@ -27,7 +28,7 @@ export function locationTrends(search: {search: String }) {
     }
 }
 
-export function trends(search: String) {
+export function trends(search: string) {
     return function(dispatch: any) {
 
         // if (search)
@@ -46,11 +47,11 @@ export function trends(search: String) {
     }
 }
 
-export function shout(error: String) {
+export function shout(error: string) {
     alert(error);
 }
 
-export function searchError(error: String): ISearchError {
+export function searchError(error: string): ISearchError {
     return {
         type: SEARCH_ERROR,
         payload: error
