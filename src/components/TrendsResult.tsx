@@ -1,24 +1,29 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-interface IHomeProps {
-    search: Boolean;
-    data: String;
+interface searchDataSchema {
+    name: string,
+    query: string,
+    url: string
 }
 
-export default class Home extends React.Component<IHomeProps, {}> {
+interface ISearchDataProps {
+    searchData: Array<searchDataSchema>
+}
+
+export default class Home extends React.Component<ISearchDataProps, {}> {
 
     public render(): JSX.Element {
         return (
-            <div> You have searched {this.props.search} 
+            <div> 
 
-                <ul className="list-group">
-                <li className="list-group-item">Cras justo odio</li>
-                <li className="list-group-item">Dapibus ac facilisis in</li>
-                <li className="list-group-item">Morbi leo risus</li>
-                <li className="list-group-item">Porta ac consectetur ac</li>
-                <li className="list-group-item">Vestibulum at eros</li>
-                </ul>
+                <div className="list-group">
+                    {this.props.searchData.map(x => {
+
+                        return <Link to={`/tweets?hash=${x.query}`} className="list-group-item list-group-item-action" id={x.name}>{x.name}</Link>
+                    })}
+                </div>
             
             </div>
 
