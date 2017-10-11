@@ -3,16 +3,19 @@ import { connect, Dispatch } from 'react-redux';
 
 import * as actions from '../actions';
 
+import TrendsResult from './TrendsResult';
+
 interface ISearchTrendsProps {
     search: {
         search: Boolean,
-        data: Array<any>
+        data: Array<any>,
+        searchData: Array<any>
     }
     searchError: Function,
     shout: Function,
     trends: Function,
     locationTrends: Function,
-    value: String,
+    value: string,
     state: any
 }
 
@@ -43,7 +46,7 @@ class SearchTrendsForm extends React.Component<ISearchTrendsProps, ISearchTrends
         this.props.locationTrends({
             search: this.state.location
         });
-        this.setState({ search: { click : true }})
+        this.setState({ search: { click : true }, page: 'trends' })
     }
 
 
@@ -71,7 +74,7 @@ class SearchTrendsForm extends React.Component<ISearchTrendsProps, ISearchTrends
                         </form>
                     </div>
                     </div>
-            </div>
+                </div>
             </div>
         )
     }
@@ -82,7 +85,23 @@ class SearchTrendsForm extends React.Component<ISearchTrendsProps, ISearchTrends
         if (this.state.page === '')
             return this.renderForm()
         else if (this.state.page === 'trends') {
-            return <div>Nothing</div>
+            if (this.props.search.searchData !== null && this.props.search.searchData !== undefined) {
+                return (
+                    <TrendsResult searchData={this.props.search.searchData} />
+                )
+            } else {
+                return (
+                    <div className="container" style={{"margin-left": "30%", "margin-top": "20%"}}>
+                        <div className="row clearfix">
+                            <div className="col-md-12 column">
+                                <div className="col-md-6 col-md-offset-3 column">
+                                    <h1>Loading</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
         } else {
             return <div>Ultra Nothing</div>
         }
