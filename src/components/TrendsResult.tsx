@@ -21,7 +21,7 @@ export default class Home extends React.Component<ISearchDataProps, {}> {
                 <div className="list-group">
                     {this.props.searchData.map(x => {
 
-                        return <Link to={`/tweets?hash=${x.query}`} className="list-group-item list-group-item-action" id={x.name}>{x.name}</Link>
+                        return <Link to={`/tweets/${x.query}`} className="list-group-item list-group-item-action" id={x.name}>{x.name}</Link>
                     })}
                 </div>
             
