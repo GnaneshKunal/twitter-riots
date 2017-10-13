@@ -2,7 +2,8 @@ import axios from 'axios';
 
 import {
     SEARCH_TRUE, SEARCH_FALSE,
-    SEARCH_ERROR, LOCATION_TRENDS
+    SEARCH_ERROR, LOCATION_TRENDS,
+    TRENDING_TWEETS
 } from './types';
 
 interface ISearchError {
@@ -44,6 +45,21 @@ export function trends(search: string) {
             .catch(error => {
                 console.log(error.response);
             })
+    }
+}
+
+export function getTrendingTweets(hash: string) {
+    return function (dispatch: any) {
+        return axios.get(`${ROOT_URL}/getTweets/${hash}`)
+            .then(response => {
+                dispatch({
+                    type: TRENDING_TWEETS,
+                    payload: response.data
+                });
+            })
+            .catch(error => {
+                console.log(error.response);
+            });
     }
 }
 
