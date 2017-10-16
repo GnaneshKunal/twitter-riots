@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
     SEARCH_TRUE, SEARCH_FALSE,
     SEARCH_ERROR, LOCATION_TRENDS,
-    TRENDING_TWEETS
+    TRENDING_TWEETS, CACHE_GEO
 } from './types';
 
 interface ISearchError {
@@ -12,6 +12,8 @@ interface ISearchError {
 }
 
 const ROOT_URL: string = 'http://localhost:8080';
+
+export type geo = { lat: Number, long: Number, woeid: Number }
 
 export function locationTrends(search: {search: string }) {
     return function(dispatch: any) {
@@ -24,26 +26,7 @@ export function locationTrends(search: {search: string }) {
                 })
             })
             .catch(err => {
-                console.log(err.response)
-            })
-    }
-}
-
-export function trends(search: string) {
-    return function(dispatch: any) {
-
-        // if (search)
-        //     return dispatch(searchError("Please enter a term"));
-        
-        return axios.get(`${ROOT_URL}/api/trends/place?place=${search.search}`)
-            .then(response => {
-                dispatch({
-                    type: SEARCH_TRUE,
-                    payload: response.data
-                });
-            })
-            .catch(error => {
-                console.log(error.response);
+                console.log(err)
             })
     }
 }
@@ -58,8 +41,17 @@ export function getTrendingTweets(hash: string) {
                 });
             })
             .catch(error => {
-                console.log(error.response);
+                console.log(error);
             });
+    }
+}
+
+export function cacheGeo(geo: geo) {
+    return function (dispatch: any) {
+        return dispatch({
+            type: CACHE_GEO,
+            payload: geo
+        });
     }
 }
 
