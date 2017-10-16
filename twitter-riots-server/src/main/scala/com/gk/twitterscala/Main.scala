@@ -61,7 +61,13 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       }
 
       Ok(
-        Json.fromValues(arr)
+        Json.obj("tweets" -> Json.fromValues(arr),
+        "geo" -> Json.obj(
+          "lat" -> Json.fromDoubleOrNull(lat),
+          "long" -> Json.fromDoubleOrNull(long),
+          "woeid" -> Json.fromInt(k)
+          )
+        )
       )
 
     case GET -> Root / "getTweets" / hashtag =>
@@ -154,8 +160,8 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     (lat.toDouble, long.toDouble)
   }
 
-  def classifyText(text: String) = {
-    def requestForClassify(text: String)= {
+  def classifyText(text: String): Int = {
+    def requestForClassify(text: String) = {
       val encodedStr = new URLEncode(text).encodedString
       val target = "http://sentistrength.wlv.ac.uk/results.php?text=" + encodedStr + "&domain=Riots&submit=Detect+Sentiment+in+Domain"
       val parserFactory = new org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
