@@ -1,85 +1,73 @@
-// import * as React from 'react';
-// import { connect, Dispatch } from 'react-redux';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
+import { connect, Dispatch } from 'react-redux';
+import * as actions from '../actions';
+import TrendsResult from './TrendsResult';
+import * as _ from 'lodash';
 
-// import * as actions from '../actions';
+interface ITrends {
+    name: string,
+    query: string,
+    url: string,
+    locationTrends: Function,
+    cacheGeo: Function,
+    match: {
+        params: {
+            location: string
+        }
+    },
+    search: {
+        trendsData: {
+            tweets: any,
+            geo: {
+                lat: Number,
+                long: Number,
+                woeid: Number
+            }
+        }
+    }
+}
 
-// import TrendsResult from './TrendsResult';
+class Trends extends React.Component<ITrends, {}> {
 
-// interface ITrendsProps {
-//     search: {
-//         search: Boolean,
-//         data: Array<any>
-//     }
-//     searchError: Function,
-//     shout: Function,
-//     trends: Function,
-//     value: String,
-//     state: any
-// }
+    constructor(props) {
+        super(props);
 
-// interface ITrendsState {
-//     location: string
-// }
+        this.props.locationTrends({
+            search: this.props.match.params.location
+        });
+    }
 
-// class Trends extends React.Component<ITrendsProps, ITrendsState> {
-    
-//     constructor(props: any) {
-//         super(props);
+    public render(): JSX.Element {
+        if (this.props.search.trendsData !== null && this.props.search.trendsData !== undefined) {
+            this.props.cacheGeo(this.props.search.trendsData.geo);
+            return (
+                <TrendsResult searchData={this.props.search.trendsData.tweets} geo={this.props.search.trendsData.geo}/>
+            )
 
-//         this.state = { location: '' };
-//     }
+        } else {
+            return (
+                <div className="container" style={{"margin-left": "30%", "margin-top": "20%"}}>
+                    <div className="row clearfix">
+                        <div className="col-md-12 column">
+                            <div className="col-md-6 col-md-offset-3 column">
+                                <h1>Loading</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+            }
+    }
+}
 
-//     onFormSubmit(event: any) {
-//         event.preventDefault();
-//         this.props.trends({
-//             search: this.state.location
-//         });
-//     }
-//     renderAlert() {
-//         if (this.props.search && this.props.search.data !== undefined && this.props.search.data.length > 0) {
-//             return(
-//                 <div className="alert alert-danger">
-//                     <strong>{this.props.search.data[0].locations[0].name}</strong>
-//                 </div>
-//             );
-//         }
-//     }
+const mapStateToProps = (state: any) => state;
 
-//     renderResult() {
-//         if (this.props.search && this.props.search.data !== undefined && this.props.search.data.length > 0) {
-//             return (
-//                 <TrendsResult search={this.props.search.data[0].locations[0].name} data={"DSA"} />
-//             );
-//         }
-//     }
+export function mapDispatchToProps(dispatch: Dispatch<any>) {
+    return {
+      locationTrends: (search: {search: string}) => dispatch<any>(actions.locationTrends(search)),
+      cacheGeo: (geo: actions.geo) => dispatch<any>(actions.cacheGeo(geo))
+    }
+  }
 
-//     public render(): JSX.Element {
-//         return (
-//             <div>
-//                 <form onSubmit={this.onFormSubmit.bind(this)}>
-//                 <fieldset className="form-group">
-//                     <label>Search</label>
-//                     <input ref="search"
-//                     name="search" className="form-control"
-//                     value={this.state.location}
-//                     onChange={event => this.setState({ location: event.target.value})}
-//                     placeholder="search" type="text" />
-//                 </fieldset>
-//                 {this.renderResult()}
-//                 <button type="submit" className="btn btn-primary">Submit</button>
-//             </form>
-                
-//             </div>
-//         );
-//     }
-// }
-
-// const mapStateToProps = (state: any) => state;
-
-// export function mapDispatchToProps(dispatch: Dispatch<any>) {
-//     return {
-//       trends: (search: String) => dispatch<any>(actions.trends(search))
-//     }
-//   }
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Trends);
+export default connect(mapStateToProps, mapDispatchToProps)(Trends);

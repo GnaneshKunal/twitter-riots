@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 interface searchDataSchema {
@@ -9,7 +8,12 @@ interface searchDataSchema {
 }
 
 interface ISearchDataProps {
-    searchData: Array<searchDataSchema>
+    searchData: Array<searchDataSchema>,
+    geo: {
+        lat: Number,
+        long: Number,
+        woeid: Number
+    }
 }
 
 export default class Home extends React.Component<ISearchDataProps, {}> {
@@ -20,8 +24,7 @@ export default class Home extends React.Component<ISearchDataProps, {}> {
 
                 <div className="list-group">
                     {this.props.searchData.map(x => {
-
-                        return <Link to={`/tweets/${x.query}`} className="list-group-item list-group-item-action" id={x.name}>{x.name}</Link>
+                        return <Link to={`/tweets/${x.query}?lat=${this.props.geo.lat}&long=${this.props.geo.long}&woeid=${this.props.geo.woeid}`} className="list-group-item list-group-item-action" id={x.name}>{x.name}</Link>
                     })}
                 </div>
             
