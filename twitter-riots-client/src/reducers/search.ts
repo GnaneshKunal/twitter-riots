@@ -14,7 +14,7 @@ export default function(state = {}, action: IActionProps) {
         case SEARCH_ERROR:
             return { ...state, search: false, data: action.payload };
         case LOCATION_TRENDS:
-            return { ...state, search: false, searchData: action.payload };
+            return { ...state, search: false, trendsData: action.payload };
     }
     
     return state;
