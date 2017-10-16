@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
+import * as queryString from 'query-string';
 
 import * as actions from '../actions';
 
@@ -11,11 +12,12 @@ interface IHashTagTweets {
     match: {
         params: {
             hash: string
-        }
+        }   
+    }
+    location: {
+        search: string
     }
 }
-
-
 
 interface ITweetData {
     id: Array<object>
@@ -31,6 +33,7 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
 
 
     renderPage(): JSX.Element {
+        const parsed = queryString.parse(this.props.location.search)
         if (this.props.tweet.tweetData !== null && this.props.tweet.tweetData !== undefined) {
             return (
                 <div>
@@ -71,7 +74,7 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
     public render(): JSX.Element {
         return (
             <div>
-                {this.renderPage()} {console.log(this.props)}
+                {this.renderPage()}
             </div>
         )
     }
