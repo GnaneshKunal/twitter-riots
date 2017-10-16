@@ -6,19 +6,6 @@ import * as actions from '../actions';
 
 import TrendsResult from './TrendsResult';
 
-interface ISearchTrendsProps {
-    search: {
-        search: Boolean,
-        data: Array<any>,
-        searchData: Array<any>
-    }
-    searchError: Function,
-    shout: Function,
-    trends: Function,
-    value: string,
-    state: any
-}
-
 interface ISearchTrendsState {
     location: string,
     search: {
@@ -27,7 +14,7 @@ interface ISearchTrendsState {
     redirect: boolean
 }
 
-class SearchTrendsForm extends React.Component<ISearchTrendsProps, ISearchTrendsState> {
+class SearchTrendsForm extends React.Component<{}, ISearchTrendsState> {
 
     constructor(props: any) {
         super(props);
