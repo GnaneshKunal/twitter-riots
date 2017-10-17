@@ -54,18 +54,25 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
 
       val m = twitter.getClosestTrends(geoL)
       val k = m.get(0).getWoeid
-      val trends = twitter.getPlaceTrends(k).getTrends
+      val trendsL = twitter.getPlaceTrends(k)
+
+      val trends = trendsL.getTrends
 
       val arr = for (x <- trends) yield {
-        Json.obj("name" -> Json.fromString(x.getName), "query" -> Json.fromString(x.getQuery), "url" -> Json.fromString(x.getURL))
+        Json.obj(
+          "name" -> Json.fromString(x.getName),
+          "query" -> Json.fromString(x.getQuery),
+          "url" -> Json.fromString(x.getURL)
+        )
       }
 
       Ok(
-        Json.obj("tweets" -> Json.fromValues(arr),
+        Json.obj("trends" -> Json.fromValues(arr),
         "geo" -> Json.obj(
           "lat" -> Json.fromDoubleOrNull(lat),
           "long" -> Json.fromDoubleOrNull(long),
-          "woeid" -> Json.fromInt(k)
+          "woeid" -> Json.fromInt(k),
+          "location" -> Json.fromString(trendsL.getLocation.getName)
           )
         )
       )
@@ -82,6 +89,28 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       while (iTweets.hasNext) {
         val t: twitter4j.Status = iTweets.next
         val tu = t.getUser
+
+        var (la, lo) = (0.0, 0.0)
+
+        if (tu.getLocation != "") {
+          try {
+            val (laTemp, loTemp) = getLatAndLong(tu.getLocation)
+            la = laTemp
+            lo = loTemp
+          }
+          catch {
+            case e: Exception =>
+              try {
+                val (laTemp, loTemp) = getLatAndLong(tu.getLocation.trim.split(' ')(0))
+                la = laTemp
+                lo = loTemp
+              }
+              catch {
+                case e: Exception => println { "Retry also failed" }
+              }
+          }
+        }
+
         tweetsJson += Json.obj(
           t.getId.toString -> Json.obj (
             "tweet" -> Json.fromString(t.getText),
@@ -94,7 +123,12 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
               "name" -> Json.fromString(tu.getName),
               "screenName" -> Json.fromString(tu.getScreenName),
               "followers" -> Json.fromInt(tu.getFollowersCount),
-              "friendsCount" -> Json.fromInt(tu.getFriendsCount)
+              "friendsCount" -> Json.fromInt(tu.getFriendsCount),
+              "location" -> Json.fromString(tu.getLocation),
+              "latLong" -> Json.obj(
+                "lat" -> Json.fromDoubleOrNull(la),
+                "long" -> Json.fromDoubleOrNull(lo)
+              )
             )
           )
         )
@@ -176,6 +210,24 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     val entities = html \\ "span" \\ "b"
 
     (for (entity <- entities) yield entity.text.toInt).toArray.sum
+  }
+
+  def breakText(str: String): String = {
+    def splitCamelCase(s: String): String =
+      s.replaceAll(
+        String.format("%s|%s|%s",
+          "(?<=[A-Z])(?=[A-Z][a-z])",
+          "(?<=[^A-Z])(?=[A-Z])",
+          "(?<=[A-Za-z])(?=[^A-Za-z])"
+        ),
+        " "
+      ).replaceAll("  ", " ")
+    import scala.language._
+    val a = splitCamelCase(str) split ' '
+    if (str.indexOf('#') != -1)
+      a.tail filter(_.nonEmpty) mkString " "
+    else
+      a filter(_.nonEmpty) mkString " "
   }
 
   def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, Nothing] = {
