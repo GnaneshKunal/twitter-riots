@@ -27,12 +27,12 @@ const MapWithAMarker = compose(
 )(props =>
   <GoogleMap
     defaultZoom={8}
-    defaultCenter={{ lat: -34.397, lng: 150.644 }}
+    defaultCenter={{ lat: 13.21028, lng: 79.089638 }}
   >
 
   
     <Marker
-      position={{ lat: -34.397, lng: 150.644 }}
+      position={{ lat: 13.21028, lng: 79.089638 }}
       onClick={props.onToggleOpen}
       icon={{
         height: 10,
