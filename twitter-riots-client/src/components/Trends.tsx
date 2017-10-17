@@ -5,6 +5,8 @@ import * as actions from '../actions';
 import TrendsResult from './TrendsResult';
 import * as _ from 'lodash';
 
+import Map from './Map3';
+
 interface ITrends {
     name: string,
     query: string,
@@ -18,11 +20,12 @@ interface ITrends {
     },
     search: {
         trendsData: {
-            tweets: any,
+            trends: any,
             geo: {
                 lat: Number,
                 long: Number,
-                woeid: Number
+                woeid: Number,
+                location: String
             }
         }
     }
@@ -42,7 +45,10 @@ class Trends extends React.Component<ITrends, {}> {
         if (this.props.search.trendsData !== null && this.props.search.trendsData !== undefined) {
             this.props.cacheGeo(this.props.search.trendsData.geo);
             return (
-                <TrendsResult searchData={this.props.search.trendsData.tweets} geo={this.props.search.trendsData.geo}/>
+                <div>
+                    {/*<Map />*/}
+                    <TrendsResult searchData={this.props.search.trendsData.trends} geo={this.props.search.trendsData.geo}/>
+                </div>
             )
 
         } else {
