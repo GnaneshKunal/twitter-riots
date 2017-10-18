@@ -38,12 +38,6 @@
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-1.0.3.tgz#fbcf7fa5eb6dd108d51385cc6987ec1f24214523"
 
-"@types/google-map-react@^0.23.0":
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/@types/google-map-react/-/google-map-react-0.23.0.tgz#6b4441094373be32860985165ad15f161ab1bfe3"
-  dependencies:
-    "@types/react" "*"
-
 "@types/history@*":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@types/history/-/history-4.6.0.tgz#093d67ed780d889c9543f6dca24ebee0b6b9fc45"
@@ -133,12 +127,6 @@
   resolved "https://registry.yarnpkg.com/@types/twit/-/twit-2.2.5.tgz#cef266daa6ebe8ed0234188a345bd9456fe83fb5"
   dependencies:
     "@types/geojson" "*"
-    "@types/node" "*"
-
-"@types/xml2js@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@types/xml2js/-/xml2js-0.4.0.tgz#e54a89a0055d5ed69305b2610f970909bf363e45"
-  dependencies:
     "@types/node" "*"
 
 abbrev@1:
@@ -1114,10 +1102,6 @@ event-stream@~3.3.0:
     stream-combiner "~0.0.4"
     through "~2.3.1"
 
-eventemitter3@^1.1.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-1.2.0.tgz#1c86991d816ad1e504750e73874224ecf3bec508"
-
 events@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/events/-/events-1.1.1.tgz#9ebdb7635ad099c70dcc4c2a1f5004288e8bd924"
@@ -1234,7 +1218,7 @@ fast-deep-equal@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.0.0.tgz#96256a3bc975595eb36d82e9929d060d893439ff"
 
-fbjs@^0.8.1, fbjs@^0.8.16, fbjs@^0.8.3:
+fbjs@^0.8.1, fbjs@^0.8.16:
   version "0.8.16"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.16.tgz#5e67432f550dc41b572bf55847b8aca64e5337db"
   dependencies:
@@ -1434,15 +1418,6 @@ global@^4.3.2:
   dependencies:
     min-document "^2.19.0"
     process "~0.5.1"
-
-google-map-react@^0.24.0:
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/google-map-react/-/google-map-react-0.24.0.tgz#7276546d303c5ae837963f8bc1386b75f1aa2c60"
-  dependencies:
-    eventemitter3 "^1.1.0"
-    fbjs "^0.8.3"
-    point-geometry "0.0.0"
-    scriptjs "^2.5.7"
 
 google-maps-infobox@^1.1.13:
   version "1.1.15"
@@ -2535,10 +2510,6 @@ pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
 
-point-geometry@0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/point-geometry/-/point-geometry-0.0.0.tgz#6fcbcad7a803b6418247dd6e49c2853c584daff7"
-
 posix-character-classes@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
@@ -2915,11 +2886,7 @@ safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.1.tgz#893312af69b2123def71f57889001671eeb2c853"
 
-sax@>=0.6.0:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
-
-scriptjs@^2.5.7, scriptjs@^2.5.8:
+scriptjs@^2.5.8:
   version "2.5.8"
   resolved "https://registry.yarnpkg.com/scriptjs/-/scriptjs-2.5.8.tgz#d0c43955c2e6bad33b6e4edf7b53b8965aa7ca5f"
 
@@ -3615,17 +3582,6 @@ write-file-atomic@^2.0.0:
 xdg-basedir@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xdg-basedir/-/xdg-basedir-3.0.0.tgz#496b2cc109eca8dbacfe2dc72b603c17c5870ad4"
-
-xml2js@^0.4.19:
-  version "0.4.19"
-  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
-  dependencies:
-    sax ">=0.6.0"
-    xmlbuilder "~9.0.1"
-
-xmlbuilder@~9.0.1:
-  version "9.0.4"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.4.tgz#519cb4ca686d005a8420d3496f3f0caeecca580f"
 
 xtend@^4.0.0:
   version "4.0.1"
