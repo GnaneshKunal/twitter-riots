@@ -14,7 +14,13 @@ import {
   lifecycle
 } from "react-google-maps";
 
-const MapWithAMarker = compose(
+
+class TrendsResultMap extends React.Component<any, any> {
+
+    constructor(props) {
+        super(props);
+
+        this.MapWithAMarker = compose(
         withStateHandlers(() => ({
             isOpen: false,
         }), {
@@ -29,29 +35,21 @@ const MapWithAMarker = compose(
             defaultZoom={8}
             defaultCenter={{ lat: parseFloat(this.props.geo.lat), lng: parseFloat(this.props.geo.long) }}
         >
-
-        
             <Marker
-            position={{ lat: parseFloat(this.props.geo.lat), lng: parseFloat(this.props.geo.long) }}
-            onClick={props.onToggleOpen}
-            icon={{
-                height: 10,
-                width: 10,
-                url: 'http://findicons.com/files/icons/2583/sweetieplus/16/circle_red_16_ns.png',
-            }}
+                position={{ lat: parseFloat(this.props.geo.lat), lng: parseFloat(this.props.geo.long) }}
+                onClick={props.onToggleOpen}
             >
             {props.isOpen && <InfoWindow onCloseClick={props.onToggleOpen}>
                 <div>
-                Controlled zoom: {props.zoom}
+                    <h3><center> Nearest Trends: <b>{this.props.geo.location}</b></center></h3>
                 </div>
             </InfoWindow>}
             </Marker>
         </GoogleMap>
         );
-
-class TrendsResultMap extends React.Component<any, any> {
+    }
     public render(): JSX.Element {
-
+        const {MapWithAMarker} = this
         return (
                 <div>
         <MapWithAMarker
