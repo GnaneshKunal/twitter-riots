@@ -55,6 +55,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       val m = twitter.getClosestTrends(geoL)
       val k = m.get(0).getWoeid
       val trendsL = twitter.getPlaceTrends(k)
+      val (la, lo) = getLatAndLong(trendsL.getLocation.getName)
 
       val trends = trendsL.getTrends
 
@@ -69,8 +70,8 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       Ok(
         Json.obj("trends" -> Json.fromValues(arr),
         "geo" -> Json.obj(
-          "lat" -> Json.fromDoubleOrNull(lat),
-          "long" -> Json.fromDoubleOrNull(long),
+          "lat" -> Json.fromDoubleOrNull(la),
+          "long" -> Json.fromDoubleOrNull(lo),
           "woeid" -> Json.fromInt(k),
           "location" -> Json.fromString(trendsL.getLocation.getName)
           )
