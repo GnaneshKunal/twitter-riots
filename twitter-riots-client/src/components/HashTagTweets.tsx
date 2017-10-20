@@ -4,6 +4,8 @@ import * as queryString from 'query-string';
 
 import * as actions from '../actions';
 
+import HashMap from './HashMap';
+
 interface IHashTagTweets {
     tweet: {
         tweetData: Array<any>
@@ -27,7 +29,7 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
 
     constructor(props: any) {
         super(props);
-
+        
         this.props.getTrendingTweets(this.props.match.params.hash);
     }
 
@@ -37,20 +39,25 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
         if (this.props.tweet.tweetData !== null && this.props.tweet.tweetData !== undefined) {
             return (
                 <div>
+                    <HashMap data={this.props.tweet.tweetData}/>
                     <div className="list-group">
                         {this.props.tweet.tweetData.map(x => {
-                            for (var key in x) {
-                                return (
-                                    <a href="#" className="list-group-item list-group-item-action flex-column align-items-start">
-                                        <div className="d-flex w-100 justify-content-between">
-                                        <h5 className="mb-1">{key}</h5>
-                                        <small className="text-muted">{x[key].sentiment}</small>
-                                        </div>
-                                        <p className="mb-1">{x[key].tweet}</p>
-                                        <small className="text-muted">{x[key].user.name} ({x[key].user.screenName})</small>
-                                    </a>
-                                )   
-                            }
+                            let style = '';
+                            if (x.sentiment < 0)
+                                style = 'danger';
+                            else if (x.sentiment === 0)
+                                style = 'info';
+                            else
+                                style = 'success';
+                            return (
+                                <div className={`card text-white bg-${style} mb-3`} style={{"max-width": "100%"}}>
+                                    {/*<div className="card-header">Header</div>*/}
+                                    <div className="card-body">
+                                        <h4 className="card-title">{x.user.name} | @{x.user.screenName} | {x.id} | {x.sentiment}</h4>
+                                        <p className="card-text">{x.tweet}</p>
+                                    </div>
+                                </div>
+                            )
                         })}
                     </div>
                 </div>
