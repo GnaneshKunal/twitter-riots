@@ -47,11 +47,6 @@ class HashMap extends React.Component<any, any> {
         >
             {this.props.data.map(x => {
                 var i = 0;
-                {/*for (var key in x) {*/}
-                    {/*let xLat = x.user.latLong.lat;
-                    let xLong= x.user.latLong.long;
-                    let lat = xLat !== 0 ? xLat : 13.31028;
-                    let long = xLong !== 0 ? xLat : 79.189638;*/}
                     console.log(gen());
                     return (
                         <Marker
@@ -65,16 +60,10 @@ class HashMap extends React.Component<any, any> {
                                     <h4>{x.user.name} | @{x.user.screenName} | {x.id} | {x.sentiment}</h4>
                                     <p>{x.tweet}</p>
                                 </div>
-                                {/*<p>{JSON.stringify(x.user.latLong.lat)}</p>*/}
-                                {/*<p>{x[key].tweet}</p>
-                                <p>{x[key].sentiment}</p>
-                                <p>{x[key].user.screenName}</p>
-                                <p>{x[key].user.friendsCount}</p>*/}
                             </div>
                         </InfoWindow>}
                         </Marker>
                     )
-                {/*}*/}
             })}
         </GoogleMap>
         );
