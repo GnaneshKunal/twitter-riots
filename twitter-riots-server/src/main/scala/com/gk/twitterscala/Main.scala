@@ -113,23 +113,22 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
         }
 
         tweetsJson += Json.obj(
-          t.getId.toString -> Json.obj (
-            "tweet" -> Json.fromString(t.getText),
-            "sentiment" -> Json.fromInt(classifyText(t.getText)),
-            "tweetID" -> Json.fromLong(t.getId),
-            "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
-            "retweetCount" -> Json.fromLong(t.getRetweetCount),
-            "user" -> Json.obj(
-              "id" -> Json.fromLong(tu.getId),
-              "name" -> Json.fromString(tu.getName),
-              "screenName" -> Json.fromString(tu.getScreenName),
-              "followers" -> Json.fromInt(tu.getFollowersCount),
-              "friendsCount" -> Json.fromInt(tu.getFriendsCount),
-              "location" -> Json.fromString(tu.getLocation),
-              "latLong" -> Json.obj(
-                "lat" -> Json.fromDoubleOrNull(la),
-                "long" -> Json.fromDoubleOrNull(lo)
-              )
+          "id" -> Json.fromBigInt(t.getId),
+          "tweet" -> Json.fromString(t.getText),
+          "sentiment" -> Json.fromInt(classifyText(t.getText)),
+          "tweetID" -> Json.fromLong(t.getId),
+          "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
+          "retweetCount" -> Json.fromLong(t.getRetweetCount),
+          "user" -> Json.obj(
+            "id" -> Json.fromLong(tu.getId),
+            "name" -> Json.fromString(tu.getName),
+            "screenName" -> Json.fromString(tu.getScreenName),
+            "followers" -> Json.fromInt(tu.getFollowersCount),
+            "friendsCount" -> Json.fromInt(tu.getFriendsCount),
+            "location" -> Json.fromString(tu.getLocation),
+            "latLong" -> Json.obj(
+              "lat" -> Json.fromDoubleOrNull(la),
+              "long" -> Json.fromDoubleOrNull(lo)
             )
           )
         )
