@@ -47,9 +47,22 @@ class HashMap extends React.Component<any, any> {
         >
             {this.props.data.map(x => {
                 var i = 0;
-                    console.log(gen());
+                let icon;
+                if (x.sentiment > 0) {
+                    icon = 'http://individual.icons-land.com/IconsPreview/Sport/PNG/16x16/Ball_Green.png';
+                } else if (x.sentiment == 0) {
+                    icon = 'http://findicons.com/files/icons/129/soft_scraps/16/button_blank_blue_01.png';
+                } else {
+                    icon = 'http://findicons.com/files/icons/2583/sweetieplus/16/circle_red_16_ns.png';
+                }
+                    {/*console.log(gen());*/}
                     return (
                         <Marker
+                        icon={{
+                            height: 10,
+                            width: 10,
+                            url: icon
+                        }}
 //                            position={{ lat: 13.31028 + gen() , lng: 79.189638 + gen() }}
                             position={{ lat: x.user.latLong.lat, lng: x.user.latLong.long }}
                             onClick={props.onToggleOpen}
