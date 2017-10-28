@@ -181,7 +181,8 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
   def getLatAndLong(location: String): (Double, Double) = {
     val httpClient = PooledHttp1Client[IO]()
     def getParseXML(location: String): IO[String] = {
-      val target = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.places%20where%20text%3D%22" + location + "%22&appid=49b44e61ea5af9b80a3b3cf9b3ace7a4a0f5924a"
+      val encodedLocation = new URLEncode(location).encodedString
+      val target = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20geo.places%20where%20text%3D%22"+ encodedLocation +"%22&appid=49b44e61ea5af9b80a3b3cf9b3ace7a4a0f5924a"
       httpClient.expect[String](target)
     }
 
