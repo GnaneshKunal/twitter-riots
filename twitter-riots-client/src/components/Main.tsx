@@ -10,10 +10,6 @@ import TrendsMap from './TrendsResultMap';
 
 const Main = (): JSX.Element => (
     <div>
-        {/*<Map />*/}
-        <Map3 />
-       {/*<Map2 />*/}
-       {/*<TrendsMap />*/}
         <SearchTrendsForm />
     </div>
 );
