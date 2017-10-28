@@ -39,7 +39,7 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
         if (this.props.tweet.tweetData !== null && this.props.tweet.tweetData !== undefined) {
             return (
                 <div>
-                    <HashMap data={this.props.tweet.tweetData}/>
+                    <HashMap data={this.props.tweet.tweetData} params={parsed}/>
                     <div className="list-group">
                         {this.props.tweet.tweetData.map(x => {
                             let style = '';
