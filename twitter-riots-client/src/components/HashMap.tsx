@@ -17,8 +17,8 @@ import {
 import * as rn from 'random-number';
 
 let gen = rn.generator({
-    min: -0.00008,
-    max: 0.01128
+    min: -0.00028,
+    max: 0.00028
 })
 
 
@@ -55,7 +55,15 @@ class HashMap extends React.Component<any, any> {
                 } else {
                     icon = 'http://findicons.com/files/icons/2583/sweetieplus/16/circle_red_16_ns.png';
                 }
-                    {/*console.log(gen());*/}
+
+                let min = -0.00008;
+                let max = 0.01128
+
+                let lat = x.user.latLong.lat
+                let long = x.user.latLong.long
+
+                lat = (lat !== 0 || "") ? lat : Number(this.props.params.lat + Math.floor(Math.random() * (0.00028 - -0.00028)) + (-0.00028))
+                long = (long !== 0 || "") ? long : Number(this.props.params.long + Math.floor(Math.random() * (0.00028 - -0.00028)) + (-0.00028))
                     return (
                         <Marker
                         icon={{
@@ -63,14 +71,13 @@ class HashMap extends React.Component<any, any> {
                             width: 10,
                             url: icon
                         }}
-//                            position={{ lat: 13.31028 + gen() , lng: 79.189638 + gen() }}
-                            position={{ lat: x.user.latLong.lat, lng: x.user.latLong.long }}
+                            position={{ lat: lat, lng: long }}
                             onClick={props.onToggleOpen}
                         >
                         {props.isOpen && <InfoWindow onCloseClick={props.onToggleOpen}>
                             <div>
                                 <div>
-                                    <h4>{x.user.name} | @{x.user.screenName} | {x.id} | {x.sentiment}</h4>
+                                    <h6>{x.user.name} | @{x.user.screenName} | {x.id} | {x.sentiment}</h6>
                                     <p>{x.tweet}</p>
                                 </div>
                             </div>
