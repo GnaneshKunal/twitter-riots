@@ -21,9 +21,19 @@ import io.circe._
 import io.circe.parser._
 import org.http4s.server.middleware._
 
-
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.duration.Duration
 import scala.xml._
+import cats.effect._
+import cats.implicits._
+import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
+
+import org.http4s.dsl.io._
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global._
 
 class URLEncode(val text: String) extends UnsupportedEncodingException {
   val encodedString = URLEncoder.encode(text, "UTF-8")
@@ -81,13 +91,21 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     case GET -> Root / "getTweets" / hashtag =>
 
       val query: twitter4j.Query = new twitter4j.Query(hashtag)
-      query.setCount(10)
+      query.setCount(50)
 
       val tweets = twitter.search(query).getTweets
       val iTweets = tweets.listIterator()
 
+      var i = 0
+
+      val sentimentData = new ArrayBuffer[Int]()
+      var pos = 0
+      var neg = 0
+      var neu = 0
       val tweetsJson = new ArrayBuffer[Json]()
       while (iTweets.hasNext) {
+//      while (i < 15) {
+        i = i + 1
         val t: twitter4j.Status = iTweets.next
         val tu = t.getUser
 
@@ -111,11 +129,30 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
               }
           }
         }
+        val sentiment = classifyText(t.getText)
+        sentimentData += sentiment
+
+
+
+//        sentiment match {
+//          case x =>
+            if (sentiment > 0)
+              pos = pos + 1
+            else if (sentiment == 0)
+              neu = neu + 1
+            else
+              neg = neg + 1
+//          case _ => 0
+//        }
+
+        println {
+          t.getId
+        }
 
         tweetsJson += Json.obj(
           "id" -> Json.fromBigInt(t.getId),
           "tweet" -> Json.fromString(t.getText),
-          "sentiment" -> Json.fromInt(classifyText(t.getText)),
+          "sentiment" -> Json.fromInt(sentiment),
           "tweetID" -> Json.fromLong(t.getId),
           "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
           "retweetCount" -> Json.fromLong(t.getRetweetCount),
@@ -134,7 +171,42 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
         )
       }
 
-      Ok(Json.fromValues(tweetsJson))
+      val sentimentDataArray = sentimentData.toArray
+
+      println {
+        sentimentDataArray.sum
+      }
+
+      println {
+        pos + " " + neg + " " + neu
+      }
+
+      if (i == 25) {
+        println {
+         tweetsJson
+        }
+        Ok(
+          Json.obj(
+            "tweets" -> Json.fromValues(tweetsJson),
+            "sentiment" -> Json.fromInt(sentimentDataArray.sum),
+            "pos" -> Json.fromInt(pos),
+            "neg" -> Json.fromInt(neg),
+            "neu" -> Json.fromInt(neu)
+          )
+        )
+      } else {
+        Ok(
+          Json.obj(
+            "tweets" -> Json.fromValues(tweetsJson),
+            "sentiment" -> Json.fromInt(sentimentDataArray.sum),
+            "pos" -> Json.fromInt(pos),
+            "neg" -> Json.fromInt(neg),
+            "neu" -> Json.fromInt(neu)
+          )
+        )
+      }
+
+
 
 
     case GET -> Root / "getUserTweets" / screenName / hashtag =>
@@ -175,6 +247,7 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     allowedHeaders = Some(Set("User-Agent", "Keep-Alive", "Content-Type")),
     exposedHeaders = Some(Set("x-header"))
   ))
+
 
 
 
@@ -231,8 +304,15 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       a filter(_.nonEmpty) mkString " "
   }
 
+//  val timeoutService = Timeout(Duration(40000, "millis"))(route)
+  import scala.concurrent._
+
+  import scala.concurrent.ExecutionContext.Implicits.global._
+
+//  val timeoutService = Timeout(Duration(400000, "millis"))(route)
   def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, Nothing] = {
     BlazeBuilder[IO]
+      .withIdleTimeout(Duration(40000000, "millis"))
       .bindHttp(8080, "0.0.0.0")
       .mountService(route,"/")
       .serve
