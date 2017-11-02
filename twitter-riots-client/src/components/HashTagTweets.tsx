@@ -2,6 +2,19 @@ import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
 import * as queryString from 'query-string';
 
+import { 
+    BarChart,
+    BarChartProps,
+    CartesianGrid,
+    XAxis,
+    XAxisProps,
+    YAxis,
+    YAxisProps,
+    Tooltip,
+    Legend,
+    Bar
+ } from 'recharts';
+
 import * as actions from '../actions';
 
 import HashMap from './HashMap';
@@ -37,8 +50,44 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
     renderPage(): JSX.Element {
         const parsed = queryString.parse(this.props.location.search)
         if (this.props.tweet.tweetData !== null && this.props.tweet.tweetData !== undefined) {
+            console.log(this.props.tweet)
+
+        let style = '';
+        if (this.props.tweet.sentiment === 0) {
+            style = 'blue';
+        } else if (this.props.tweet.sentiment > 0) {
+            style = 'green';
+        } else {
+            style = 'red';
+        }
+
+        let data = [
+            {name: 'pos', pos: this.props.tweet.pos},
+            {name: 'neu', neu: this.props.tweet.neu},
+            {name: 'neg', neg: this.props.tweet.neg},
+            {name: 'total', total: Number(this.props.tweet.tweetData.length) }
+        ]
             return (
                 <div>
+                    <div>
+                        {/*<h3>Total Number of tweets: {this.props.tweet.tweetData.length}</h3>*/}
+                        <h3>Positive tweets: <span style={{color: 'green'}}>{this.props.tweet.pos}</span></h3>
+                        <h3>Neutral tweets: <span style={{color: 'blue'}}>{this.props.tweet.neu}</span></h3>
+                        <h3>Negative tweets: <span style={{color: 'red'}}>{this.props.tweet.neg}</span></h3>
+                        <h3>Total sentiment: <span style={{color: style }}>{this.props.tweet.sentiment}</span></h3>
+                    </div>
+                    <BarChart width={730} height={250} data={data}>
+                        <CartesianGrid strokeDasharray="4 4" />
+                        <XAxis dataKey="sentiment" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="pos" fill="#00ff00" />
+                        <Bar dataKey="neu" fill="#0000ff" />
+                        <Bar dataKey="neg" fill="#ff0000" />
+                        <Bar dataKey="total" fill="#ffffff" />
+                    </BarChart>
+
                     <HashMap data={this.props.tweet.tweetData} params={parsed}/>
                     <div className="list-group">
                         {this.props.tweet.tweetData.map(x => {
