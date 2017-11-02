@@ -43,7 +43,8 @@ class HashMap extends React.Component<any, any> {
         )(props =>
         <GoogleMap
             defaultZoom={8}
-            defaultCenter={{ lat: 13.21028, lng: 79.089638 }}
+ //           defaultCenter={{ lat: 13.21028, lng: 79.089638 }}
+            defaultCenter={{ lat: Number(this.props.params.lat), lng: Number(this.props.params.long) }}
         >
             {this.props.data.map(x => {
                 var i = 0;
@@ -95,7 +96,7 @@ class HashMap extends React.Component<any, any> {
         <MapWithAMarker
             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyBmQ6a6fqOabymhahuL4xyL5--MJPuEf_g&v=3.exp&libraries=geometry,drawing,places"
             loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `400px` }} />}
+            containerElement={<div style={{ height: `800px` }} />}
             mapElement={<div style={{ height: `100%` }} />}
             />
     </div>
