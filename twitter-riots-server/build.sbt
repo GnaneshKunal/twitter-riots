@@ -24,6 +24,9 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % circeVersion)
 
+
+libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.8.0" artifacts (Artifact("stanford-corenlp", "models"), Artifact("stanford-corenlp"))
+
 libraryDependencies += "org.twitter4j" % "twitter4j-stream" % "4.0.4"
 libraryDependencies += "org.scala-lang.modules" % "scala-xml_2.12" % "1.0.6"
 libraryDependencies += "com.ibm.watson.developer_cloud" % "java-sdk" % "3.7.2"
