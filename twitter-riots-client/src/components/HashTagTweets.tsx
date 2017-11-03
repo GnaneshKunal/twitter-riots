@@ -85,19 +85,26 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
                         <Bar dataKey="pos" fill="#00ff00" />
                         <Bar dataKey="neu" fill="#0000ff" />
                         <Bar dataKey="neg" fill="#ff0000" />
-                        <Bar dataKey="total" fill="#ffffff" />
+                        <Bar dataKey="total" fill="#000000" />
                     </BarChart>
 
                     <HashMap data={this.props.tweet.tweetData} params={parsed}/>
                     <div className="list-group">
                         {this.props.tweet.tweetData.map(x => {
                             let style = '';
-                            if (x.sentiment < 0)
+                            {/*if (x.sentiment < 0)
                                 style = 'danger';
                             else if (x.sentiment === 0)
                                 style = 'info';
                             else
-                                style = 'success';
+                                style = 'success';*/}
+                                console.log(x.sentiment)
+                                if (x.sentiment === 'POSITIVE')
+                                    style = 'success';
+                                else if (x.sentiment === 'NEUTRAL')
+                                    style = 'info';
+                                else 
+                                    style = 'danger';
                             return (
                                 <div className={`card text-white bg-${style} mb-3`} style={{"max-width": "100%"}}>
                                     {/*<div className="card-header">Header</div>*/}
