@@ -24,16 +24,55 @@ import org.http4s.server.middleware._
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.xml._
-import cats.effect._
-import cats.implicits._
-import java.util.concurrent.TimeoutException
-import java.util.concurrent.atomic.AtomicBoolean
+import java.nio.charset.Charset
+import java.util.Properties
 
-import org.http4s.dsl.io._
+import com.gk.twitterscala.Sentiment.Sentiment
+import edu.stanford.nlp.ling.CoreAnnotations
+import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
+import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
+import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global._
+import scala.collection.convert.wrapAll._
+
+object Sentiment extends Enumeration {
+  type Sentiment = Value
+  val POSITIVE, NEGATIVE, NEUTRAL = Value
+
+  def toSentiment(sentiment: Int): Sentiment = sentiment match {
+    case x if x == 0 || x == 1 => Sentiment.NEGATIVE
+    case 2 => Sentiment.NEUTRAL
+    case x if x == 3 || x == 4 => Sentiment.POSITIVE
+  }
+}
+
+object SentimentAnalyzer {
+
+  val props = new Properties()
+  props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
+  val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
+
+  def mainSentiment(input: String): Sentiment = Option(input) match {
+    case Some(text) if !text.isEmpty => extractSentiment(text)
+    case _ => throw new IllegalArgumentException("input can't be null or empty")
+  }
+
+  private def extractSentiment(text: String): Sentiment = {
+    val (_, sentiment) = extractSentiments(text)
+      .maxBy { case (sentence, _) => sentence.length }
+    sentiment
+  }
+
+  def extractSentiments(text: String): List[(String, Sentiment)] = {
+    val annotation: Annotation = pipeline.process(text)
+    val sentences = annotation.get(classOf[CoreAnnotations.SentencesAnnotation])
+    sentences
+      .map(sentence => (sentence, sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])))
+      .map { case (sentence, tree) => (sentence.toString,Sentiment.toSentiment(RNNCoreAnnotations.getPredictedClass(tree))) }
+      .toList
+  }
+
+}
 
 class URLEncode(val text: String) extends UnsupportedEncodingException {
   val encodedString = URLEncoder.encode(text, "UTF-8")
@@ -91,14 +130,14 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     case GET -> Root / "getTweets" / hashtag =>
 
       val query: twitter4j.Query = new twitter4j.Query(hashtag)
-      query.setCount(50)
+      query.setCount(100)
 
       val tweets = twitter.search(query).getTweets
       val iTweets = tweets.listIterator()
 
       var i = 0
 
-      val sentimentData = new ArrayBuffer[Int]()
+      val sentimentData = new ArrayBuffer[Sentiment.Sentiment]()
       var pos = 0
       var neg = 0
       var neu = 0
@@ -129,16 +168,18 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
               }
           }
         }
-        val sentiment = classifyText(t.getText)
+
+//        val sentiment = classifyText(t.getText)
+        val sentiment = extractSentiment(t.getText)
         sentimentData += sentiment
 
 
 
 //        sentiment match {
 //          case x =>
-            if (sentiment > 0)
+            if (sentiment == Sentiment.POSITIVE)
               pos = pos + 1
-            else if (sentiment == 0)
+            else if (sentiment == Sentiment.NEUTRAL)
               neu = neu + 1
             else
               neg = neg + 1
@@ -146,13 +187,14 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
 //        }
 
         println {
-          t.getId
+          t.getId + " " + SentimentAnalyzer.mainSentiment(t.getText)
         }
+
 
         tweetsJson += Json.obj(
           "id" -> Json.fromBigInt(t.getId),
           "tweet" -> Json.fromString(t.getText),
-          "sentiment" -> Json.fromInt(sentiment),
+          "sentiment" -> Json.fromString(sentiment.toString),
           "tweetID" -> Json.fromLong(t.getId),
           "favouriteCount" -> Json.fromLong(t.getFavoriteCount),
           "retweetCount" -> Json.fromLong(t.getRetweetCount),
@@ -173,38 +215,25 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
 
       val sentimentDataArray = sentimentData.toArray
 
-      println {
-        sentimentDataArray.sum
-      }
+//      println {
+//        sentimentDataArray.sum
+//      }
 
       println {
         pos + " " + neg + " " + neu
       }
 
-      if (i == 25) {
-        println {
-         tweetsJson
-        }
+
         Ok(
           Json.obj(
             "tweets" -> Json.fromValues(tweetsJson),
-            "sentiment" -> Json.fromInt(sentimentDataArray.sum),
+//            "sentiment" -> Json.fromInt(sentimentDataArray.sum),
+            "sentiment" -> Json.fromInt(pos - neg + neu),
             "pos" -> Json.fromInt(pos),
             "neg" -> Json.fromInt(neg),
             "neu" -> Json.fromInt(neu)
           )
         )
-      } else {
-        Ok(
-          Json.obj(
-            "tweets" -> Json.fromValues(tweetsJson),
-            "sentiment" -> Json.fromInt(sentimentDataArray.sum),
-            "pos" -> Json.fromInt(pos),
-            "neg" -> Json.fromInt(neg),
-            "neu" -> Json.fromInt(neu)
-          )
-        )
-      }
 
 
 
@@ -286,6 +315,8 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
     (for (entity <- entities) yield entity.text.toInt).toArray.sum
   }
 
+  def extractSentiment(text: String): Sentiment.Sentiment = SentimentAnalyzer.mainSentiment(text)
+
   def breakText(str: String): String = {
     def splitCamelCase(s: String): String =
       s.replaceAll(
@@ -304,12 +335,6 @@ object Main extends StreamApp[IO] with Http4sDsl[IO] {
       a filter(_.nonEmpty) mkString " "
   }
 
-//  val timeoutService = Timeout(Duration(40000, "millis"))(route)
-  import scala.concurrent._
-
-  import scala.concurrent.ExecutionContext.Implicits.global._
-
-//  val timeoutService = Timeout(Duration(400000, "millis"))(route)
   def stream(args: List[String], requestShutdown: IO[Unit]): fs2.Stream[IO, Nothing] = {
     BlazeBuilder[IO]
       .withIdleTimeout(Duration(40000000, "millis"))
