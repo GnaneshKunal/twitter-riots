@@ -28,12 +28,14 @@ yarn install
 yarn start
 ```
 
-Images:
+## Images:
 
-[[https://www.dropbox.com/s/mtu70uh57smhpth/1.png|alt=alt Initial page]]
-![alt get trends](https://www.dropbox.com/s/xiw0z6c8bm3juve/2.png)
-![alt server logs](https://www.dropbox.com/s/1t5bgcot30mewzt/3.png)
-![alt analyze and plot](https://www.dropbox.com/s/enbunq95s9cnl9z/4.png)
+<div align="center">
+  <img src="https://www.dropbox.com/s/mtu70uh57smhpth/1.png?raw=1"><br><br>
+  <img src="https://www.dropbox.com/s/xiw0z6c8bm3juve/2.png?raw=1"><br><br>
+  <img src="https://www.dropbox.com/s/1t5bgcot30mewzt/3.png?raw=1"><br><br>
+  <img src="https://www.dropbox.com/s/enbunq95s9cnl9z/4.png?raw=1"><br><br>
+</div>
 
 ## License
 
