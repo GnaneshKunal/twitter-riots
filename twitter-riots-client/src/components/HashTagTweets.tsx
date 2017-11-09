@@ -50,7 +50,6 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
     renderPage(): JSX.Element {
         const parsed = queryString.parse(this.props.location.search)
         if (this.props.tweet.tweetData !== null && this.props.tweet.tweetData !== undefined) {
-            console.log(this.props.tweet)
 
         let style = '';
         if (this.props.tweet.sentiment === 0) {
@@ -70,7 +69,6 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
             return (
                 <div>
                     <div>
-                        {/*<h3>Total Number of tweets: {this.props.tweet.tweetData.length}</h3>*/}
                         <h3>Positive tweets: <span style={{color: 'green'}}>{this.props.tweet.pos}</span></h3>
                         <h3>Neutral tweets: <span style={{color: 'blue'}}>{this.props.tweet.neu}</span></h3>
                         <h3>Negative tweets: <span style={{color: 'red'}}>{this.props.tweet.neg}</span></h3>
@@ -92,13 +90,6 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
                     <div className="list-group">
                         {this.props.tweet.tweetData.map(x => {
                             let style = '';
-                            {/*if (x.sentiment < 0)
-                                style = 'danger';
-                            else if (x.sentiment === 0)
-                                style = 'info';
-                            else
-                                style = 'success';*/}
-                                console.log(x.sentiment)
                                 if (x.sentiment === 'POSITIVE')
                                     style = 'success';
                                 else if (x.sentiment === 'NEUTRAL')
@@ -107,7 +98,6 @@ class HashTagTweets extends React.Component<IHashTagTweets, {}> {
                                     style = 'danger';
                             return (
                                 <div className={`card text-white bg-${style} mb-3`} style={{"max-width": "100%"}}>
-                                    {/*<div className="card-header">Header</div>*/}
                                     <div className="card-body">
                                         <h4 className="card-title">{x.user.name} | @{x.user.screenName} | {x.id} | {x.sentiment}</h4>
                                         <p className="card-text">{x.tweet}</p>
